@@ -7,24 +7,65 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* Quick working dashboard styles */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Poppins', sans-serif; background: #f0f2f5; }
         
-        .header {
+        .topbar {
             background: #1a3c6e;
             color: white;
             padding: 16px 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
         
-        .header h1 { font-size: 20px; }
-        .header .user { display: flex; align-items: center; gap: 12px; }
+        .topbar h1 { font-size: 20px; }
+        .topbar h1 i { margin-right: 10px; }
         
-        .container { max-width: 1200px; margin: 0 auto; padding: 24px; }
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
         
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .user-info .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+        
+        .logout-btn {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: 0.3s;
+        }
+        
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.25);
+        }
+        
+        .container { max-width: 1400px; margin: 0 auto; padding: 24px; }
+        
+        /* Stats Grid */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -37,138 +78,394 @@
             padding: 20px;
             border-radius: 12px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: 0.3s;
         }
         
-        .stat-card .label { color: #666; font-size: 13px; }
-        .stat-card .value { font-size: 24px; font-weight: 700; color: #1a3c6e; margin-top: 4px; }
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+        }
         
-        .card {
+        .stat-card .label {
+            color: #666;
+            font-size: 13px;
+        }
+        
+        .stat-card .value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a3c6e;
+            margin-top: 4px;
+        }
+        
+        .stat-card .value.green { color: #28a745; }
+        .stat-card .value.red { color: #dc3545; }
+        .stat-card .value.orange { color: #ffc107; }
+        
+        /* Sync Bar */
+        .sync-bar {
             background: white;
+            padding: 12px 20px;
             border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 12px;
         }
         
-        .card h3 { margin-bottom: 16px; color: #1a3c6e; }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
+        .sync-status {
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
         
-        th, td {
-            padding: 10px 12px;
-            text-align: left;
-            border-bottom: 1px solid #eee;
+        .sync-status .indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #28a745;
         }
         
-        th { background: #f8f9fa; font-weight: 600; color: #333; }
+        .sync-status .indicator.syncing {
+            background: #ffc107;
+            animation: pulse 1s infinite;
+        }
         
-        .btn {
-            padding: 8px 16px;
+        .sync-status .indicator.error {
+            background: #dc3545;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .sync-btn {
+            padding: 8px 20px;
             background: #1a3c6e;
             color: white;
             border: none;
             border-radius: 6px;
             cursor: pointer;
             font-family: inherit;
+            transition: 0.3s;
         }
         
-        .btn:hover { background: #0f284a; }
-        .btn-danger { background: #dc3545; }
-        .btn-danger:hover { background: #c82333; }
-        .btn-success { background: #28a745; }
-        .btn-success:hover { background: #218838; }
+        .sync-btn:hover {
+            background: #0f284a;
+        }
         
-        .logout-btn {
-            background: rgba(255,255,255,0.2);
-            color: white;
+        .sync-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        /* Search & Actions */
+        .actions-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+            position: relative;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 10px 14px 10px 40px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+        
+        .search-box input:focus {
+            outline: none;
+            border-color: #1a3c6e;
+            box-shadow: 0 0 0 4px rgba(26, 60, 110, 0.1);
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
             border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
+            border-radius: 8px;
+            font-family: inherit;
+            font-weight: 500;
             cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         
-        .logout-btn:hover { background: rgba(255,255,255,0.3); }
+        .btn-primary { background: #1a3c6e; color: white; }
+        .btn-primary:hover { background: #0f284a; transform: translateY(-2px); }
         
-        .text-center { text-align: center; }
-        .text-muted { color: #666; }
-        .mt-2 { margin-top: 16px; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-success:hover { background: #218838; transform: translateY(-2px); }
         
-        .badge {
-            display: inline-block;
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-danger:hover { background: #c82333; transform: translateY(-2px); }
+        
+        .btn-outline { background: white; color: #1a3c6e; border: 2px solid #1a3c6e; }
+        .btn-outline:hover { background: #1a3c6e; color: white; }
+        
+        /* Customer Table */
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+        
+        .card-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card-header h3 {
+            font-size: 16px;
+            color: #333;
+        }
+        
+        .table-responsive {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th {
+            background: #f8f9fa;
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: #555;
+            font-size: 13px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 14px;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status-badge.paid { background: #d4edda; color: #155724; }
+        .status-badge.pending { background: #f8d7da; color: #721c24; }
+        .status-badge.partial { background: #fff3cd; color: #856404; }
+        
+        .code-badge {
+            background: #e3f2fd;
+            color: #1a3c6e;
             padding: 2px 10px;
             border-radius: 12px;
             font-size: 12px;
             font-weight: 600;
         }
         
-        .badge-paid { background: #d4edda; color: #155724; }
-        .badge-pending { background: #f8d7da; color: #721c24; }
-        .badge-partial { background: #fff3cd; color: #856404; }
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+        
+        .empty-state i {
+            font-size: 48px;
+            display: block;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+        
+        .loading-row td {
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 32px;
+            height: 32px;
+            border: 4px solid #e0e0e0;
+            border-top-color: #1a3c6e;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 16px 24px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+            z-index: 999;
+            max-width: 400px;
+        }
+        
+        .toast.show {
+            transform: translateX(0);
+        }
+        
+        .toast.success { background: #28a745; }
+        .toast.error { background: #dc3545; }
+        .toast.warning { background: #ffc107; color: #333; }
+        .toast.info { background: #17a2b8; }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .topbar { flex-wrap: wrap; gap: 10px; }
+            .sync-bar { flex-direction: column; align-items: stretch; }
+            .actions-bar { flex-direction: column; }
+            .search-box { min-width: 100%; }
+        }
+        
+        @media (max-width: 480px) {
+            .stats-grid { grid-template-columns: 1fr; }
+            .container { padding: 12px; }
+        }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1><i class="fas fa-receipt"></i> VSCN Billing</h1>
-        <div class="user">
-            <span id="userName">Loading...</span>
-            <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    <!-- Top Bar -->
+    <div class="topbar">
+        <h1><i class="fas fa-receipt"></i> VSCN Billing Dashboard</h1>
+        <div class="topbar-right">
+            <div class="user-info">
+                <div class="avatar" id="userAvatar">A</div>
+                <span id="userName">Administrator</span>
+            </div>
+            <button class="logout-btn" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
         </div>
     </div>
     
     <div class="container">
+        <!-- Sync Bar -->
+        <div class="sync-bar">
+            <div class="sync-status">
+                <div class="indicator" id="syncIndicator"></div>
+                <span id="syncStatusText">Ready</span>
+                <span style="color: #999; font-size: 13px;" id="lastSyncTime">Last sync: Never</span>
+            </div>
+            <div style="display: flex; gap: 8px;">
+                <button class="sync-btn" id="syncBtn" onclick="syncData()">
+                    <i class="fas fa-sync-alt"></i> Sync Now
+                </button>
+            </div>
+        </div>
+        
         <!-- Stats -->
         <div class="stats-grid" id="statsGrid">
             <div class="stat-card">
-                <div class="label">Total Customers</div>
+                <div class="label"><i class="fas fa-users"></i> Total Customers</div>
                 <div class="value" id="totalCustomers">0</div>
             </div>
             <div class="stat-card">
-                <div class="label">Today's Collection</div>
-                <div class="value" id="todayCollection">₹0</div>
+                <div class="label"><i class="fas fa-check-circle"></i> Paid</div>
+                <div class="value green" id="totalPaid">0</div>
             </div>
             <div class="stat-card">
-                <div class="label">This Month</div>
-                <div class="value" id="monthCollection">₹0</div>
+                <div class="label"><i class="fas fa-clock"></i> Pending</div>
+                <div class="value red" id="totalPending">0</div>
             </div>
             <div class="stat-card">
-                <div class="label">Pending</div>
-                <div class="value" id="pendingCount">0</div>
+                <div class="label"><i class="fas fa-money-bill-wave"></i> Today's Collection</div>
+                <div class="value green" id="todayCollection">₹0</div>
             </div>
         </div>
         
-        <!-- Quick Actions -->
-        <div class="card">
-            <h3><i class="fas fa-bolt"></i> Quick Actions</h3>
-            <div style="display:flex;gap:12px;flex-wrap:wrap;">
-                <button class="btn btn-success" onclick="showPayment()"><i class="fas fa-hand-holding-usd"></i> New Payment</button>
-                <button class="btn" onclick="showCustomers()"><i class="fas fa-users"></i> Customers</button>
-                <button class="btn" onclick="showReports()"><i class="fas fa-chart-bar"></i> Reports</button>
+        <!-- Actions -->
+        <div class="actions-bar">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Search by name, code, STB ID, or phone..." onkeyup="searchCustomers(this.value)">
+            </div>
+            <div class="action-buttons">
+                <button class="btn btn-success" onclick="showPaymentModal()">
+                    <i class="fas fa-hand-holding-usd"></i> New Payment
+                </button>
+                <button class="btn btn-outline" onclick="exportData()">
+                    <i class="fas fa-download"></i> Export
+                </button>
             </div>
         </div>
         
-        <!-- Recent Payments -->
+        <!-- Customer Table -->
         <div class="card">
-            <h3><i class="fas fa-history"></i> Recent Payments</h3>
-            <div style="overflow-x:auto;">
+            <div class="card-header">
+                <h3><i class="fas fa-list"></i> Customers</h3>
+                <span style="font-size: 13px; color: #999;" id="customerCount">0 customers</span>
+            </div>
+            <div class="table-responsive">
                 <table>
                     <thead>
                         <tr>
-                            <th>Receipt</th>
-                            <th>Customer</th>
+                            <th>Name</th>
                             <th>Code</th>
-                            <th>Month</th>
-                            <th>Amount</th>
-                            <th>Mode</th>
-                            <th>Date</th>
+                            <th>STB ID</th>
+                            <th>Phone</th>
+                            <th>Monthly</th>
+                            <th>Paid</th>
+                            <th>Pending</th>
+                            <th>Status</th>
+                            <th>Paid Months</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
-                    <tbody id="recentPayments">
-                        <tr>
-                            <td colspan="7" class="text-center text-muted">
-                                <div class="loading-spinner">Loading...</div>
+                    <tbody id="customerTableBody">
+                        <tr class="loading-row">
+                            <td colspan="10">
+                                <div class="spinner"></div>
+                                <div style="margin-top: 8px; color: #999;">Loading customers...</div>
                             </td>
                         </tr>
                     </tbody>
@@ -176,103 +473,387 @@
             </div>
         </div>
     </div>
+    
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
 
     <script>
-        // Check if user is logged in
-        const userData = localStorage.getItem('vscn_user');
-        if (!userData) {
-            window.location.href = 'index.html';
-        }
+        // ==========================================================
+        // CONFIGURATION
+        // ==========================================================
         
-        const user = JSON.parse(userData);
-        document.getElementById('userName').textContent = user.name || 'User';
+        // UPDATE THIS URL WITH YOUR DEPLOYMENT
+        const API_URL = 'https://script.google.com/macros/library/d/1CI8XTx0_zmVMAmU2D5AFumXBQsdVuYJiexjzBKSzk4ZNNm_Wv-tSwNs9/195';
         
-        // API Configuration
-        const API_BASE = 'https://script.google.com/macros/library/d/1CI8XTx0_zmVMAmU2D5AFumXBQsdVuYJiexjzBKSzk4ZNNm_Wv-tSwNs9/195';
+        // ==========================================================
+        // STATE
+        // ==========================================================
         
-        // Load dashboard data
-        async function loadDashboard() {
+        let customers = [];
+        let filteredCustomers = [];
+        let stats = {};
+        let isSyncing = false;
+        
+        // ==========================================================
+        // INITIALIZATION
+        // ==========================================================
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check authentication
+            const userData = localStorage.getItem('vscn_user');
+            if (!userData) {
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            // Set user info
             try {
-                // Simulate loading data
-                const stats = {
-                    totalCustomers: 125,
-                    todayCollection: 12450,
-                    monthCollection: 234560,
-                    pendingCount: 32
-                };
+                const user = JSON.parse(userData);
+                document.getElementById('userName').textContent = user.name || 'User';
+                document.getElementById('userAvatar').textContent = (user.name || 'U')[0].toUpperCase();
+            } catch (e) {
+                console.error('User data error:', e);
+            }
+            
+            // Load cached data
+            loadFromCache();
+            
+            // Auto sync every 5 minutes
+            setInterval(syncData, 5 * 60 * 1000);
+            
+            // Initial sync
+            setTimeout(syncData, 1000);
+        });
+        
+        // ==========================================================
+        // LOAD FROM CACHE
+        // ==========================================================
+        
+        function loadFromCache() {
+            try {
+                // Load customers
+                const cachedCustomers = localStorage.getItem('vscn_customers');
+                if (cachedCustomers) {
+                    customers = JSON.parse(cachedCustomers);
+                    filteredCustomers = [...customers];
+                    renderCustomers();
+                }
                 
-                document.getElementById('totalCustomers').textContent = stats.totalCustomers;
-                document.getElementById('todayCollection').textContent = `₹${stats.todayCollection.toFixed(2)}`;
-                document.getElementById('monthCollection').textContent = `₹${stats.monthCollection.toFixed(2)}`;
-                document.getElementById('pendingCount').textContent = stats.pendingCount;
+                // Load stats
+                const cachedStats = localStorage.getItem('vscn_stats');
+                if (cachedStats) {
+                    stats = JSON.parse(cachedStats);
+                    updateStats();
+                }
                 
-                // Load recent payments
-                const payments = [
-                    { receipt: 'VSCN-001', customer: 'Rajesh Kumar', code: 'VSCN001', month: 'March', amount: 1500, mode: 'CASH', date: '2026-07-27' },
-                    { receipt: 'VSCN-002', customer: 'Priya Sharma', code: 'VSCN002', month: 'April', amount: 2000, mode: 'UPI', date: '2026-07-27' },
-                    { receipt: 'VSCN-003', customer: 'Amit Singh', code: 'VSCN003', month: 'March', amount: 1500, mode: 'CASH', date: '2026-07-26' },
-                ];
-                
-                const tbody = document.getElementById('recentPayments');
-                if (payments.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No recent payments</td></tr>';
-                } else {
-                    tbody.innerHTML = payments.map(p => `
-                        <tr>
-                            <td><strong>${p.receipt}</strong></td>
-                            <td>${p.customer}</td>
-                            <td><span class="badge badge-paid">${p.code}</span></td>
-                            <td>${p.month}</td>
-                            <td><strong>₹${p.amount}</strong></td>
-                            <td><span class="badge badge-paid">${p.mode}</span></td>
-                            <td>${p.date}</td>
-                        </tr>
-                    `).join('');
+                // Load sync time
+                const lastSync = localStorage.getItem('vscn_last_sync');
+                if (lastSync) {
+                    document.getElementById('lastSyncTime').textContent = 
+                        `Last sync: ${new Date(lastSync).toLocaleString()}`;
                 }
                 
             } catch (error) {
-                console.error('Error loading dashboard:', error);
-                showToast('Error loading data', 'error');
+                console.error('Cache load error:', error);
             }
         }
         
-        function showToast(message, type = 'info') {
-            alert(message);
+        // ==========================================================
+        // SYNC DATA
+        // ==========================================================
+        
+        async function syncData() {
+            if (isSyncing) {
+                showToast('Sync already in progress...', 'warning');
+                return;
+            }
+            
+            isSyncing = true;
+            const syncBtn = document.getElementById('syncBtn');
+            const indicator = document.getElementById('syncIndicator');
+            const statusText = document.getElementById('syncStatusText');
+            
+            syncBtn.disabled = true;
+            syncBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Syncing...';
+            indicator.className = 'indicator syncing';
+            statusText.textContent = 'Syncing...';
+            
+            try {
+                // Sync customers
+                const customersResult = await callAPI('getCustomers');
+                if (customersResult.success) {
+                    customers = customersResult.data || [];
+                    filteredCustomers = [...customers];
+                    localStorage.setItem('vscn_customers', JSON.stringify(customers));
+                    renderCustomers();
+                }
+                
+                // Sync stats
+                const statsResult = await callAPI('getStats');
+                if (statsResult.success) {
+                    stats = statsResult.data || {};
+                    localStorage.setItem('vscn_stats', JSON.stringify(stats));
+                    updateStats();
+                }
+                
+                // Update sync time
+                const now = new Date().toISOString();
+                localStorage.setItem('vscn_last_sync', now);
+                document.getElementById('lastSyncTime').textContent = 
+                    `Last sync: ${new Date(now).toLocaleString()}`;
+                
+                indicator.className = 'indicator';
+                statusText.textContent = `Synced ${customers.length} customers`;
+                showToast(`Synced ${customers.length} customers successfully`, 'success');
+                
+            } catch (error) {
+                console.error('Sync error:', error);
+                indicator.className = 'indicator error';
+                statusText.textContent = 'Sync failed';
+                showToast('Sync failed: ' + error.message, 'error');
+            } finally {
+                isSyncing = false;
+                syncBtn.disabled = false;
+                syncBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Sync Now';
+            }
         }
         
-        function showPayment() {
-            alert('Payment page - coming soon!');
+        // ==========================================================
+        // API CALL
+        // ==========================================================
+        
+        async function callAPI(action) {
+            try {
+                const url = `${API_URL}?action=${action}`;
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                return await response.json();
+                
+            } catch (error) {
+                console.error('API call error:', error);
+                throw error;
+            }
         }
         
-        function showCustomers() {
-            alert('Customers page - coming soon!');
+        // ==========================================================
+        // UPDATE STATS
+        // ==========================================================
+        
+        function updateStats() {
+            document.getElementById('totalCustomers').textContent = stats.totalCustomers || 0;
+            document.getElementById('totalPaid').textContent = stats.totalPaid || 0;
+            document.getElementById('totalPending').textContent = stats.pendingCount || 0;
+            document.getElementById('todayCollection').textContent = 
+                `₹${(stats.todayCollection || 0).toFixed(2)}`;
         }
         
-        function showReports() {
-            alert('Reports page - coming soon!');
+        // ==========================================================
+        // RENDER CUSTOMERS
+        // ==========================================================
+        
+        function renderCustomers() {
+            const tbody = document.getElementById('customerTableBody');
+            const displayCustomers = filteredCustomers.length > 0 ? filteredCustomers : customers;
+            
+            if (displayCustomers.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="10">
+                            <div class="empty-state">
+                                <i class="fas fa-users"></i>
+                                <p>No customers found. ${customers.length === 0 ? 'Sync data first.' : 'Try a different search.'}</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                document.getElementById('customerCount').textContent = '0 customers';
+                return;
+            }
+            
+            tbody.innerHTML = displayCustomers.map(c => `
+                <tr>
+                    <td><strong>${c.name || '-'}</strong></td>
+                    <td><span class="code-badge">${c.code || '-'}</span></td>
+                    <td>${c.stbId || '-'}</td>
+                    <td>${c.phone || '-'}</td>
+                    <td>₹${(c.monthlyAmount || 0).toFixed(2)}</td>
+                    <td>₹${(c.paidAmount || 0).toFixed(2)}</td>
+                    <td style="color: ${(c.pendingAmount || 0) > 0 ? '#dc3545' : '#28a745'}">
+                        ₹${(c.pendingAmount || 0).toFixed(2)}
+                    </td>
+                    <td>
+                        <span class="status-badge ${(c.status || 'PENDING').toLowerCase()}">
+                            ${c.status || 'PENDING'}
+                        </span>
+                    </td>
+                    <td>${c.paidMonths || 0}</td>
+                    <td>
+                        <button class="btn btn-success" style="padding: 4px 12px; font-size: 12px;" 
+                                onclick="quickPayment('${c.code}')">
+                            <i class="fas fa-hand-holding-usd"></i> Pay
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+            
+            document.getElementById('customerCount').textContent = 
+                `${displayCustomers.length} customers (${customers.length} total)`;
         }
+        
+        // ==========================================================
+        // SEARCH CUSTOMERS
+        // ==========================================================
+        
+        function searchCustomers(query) {
+            const search = query.toLowerCase().trim();
+            
+            if (!search) {
+                filteredCustomers = [...customers];
+            } else {
+                filteredCustomers = customers.filter(c => 
+                    (c.name && c.name.toLowerCase().includes(search)) ||
+                    (c.code && c.code.toLowerCase().includes(search)) ||
+                    (c.stbId && c.stbId.toLowerCase().includes(search)) ||
+                    (c.phone && c.phone.includes(search))
+                );
+            }
+            
+            renderCustomers();
+        }
+        
+        // ==========================================================
+        // QUICK PAYMENT
+        // ==========================================================
+        
+        function quickPayment(code) {
+            // Find customer
+            const customer = customers.find(c => c.code === code);
+            if (!customer) {
+                showToast('Customer not found', 'error');
+                return;
+            }
+            
+            // Pre-fill payment form
+            const amount = customer.pendingAmount > 0 ? customer.pendingAmount : customer.monthlyAmount;
+            
+            const confirmMsg = `Process payment for ${customer.name}?\n\n` +
+                              `Code: ${customer.code}\n` +
+                              `Amount: ₹${amount.toFixed(2)}\n` +
+                              `Status: ${customer.status}`;
+            
+            if (confirm(confirmMsg)) {
+                showToast(`Payment initiated for ${customer.name}`, 'success');
+                // Redirect to payment page with pre-filled data
+                window.location.href = `payment.html?code=${customer.code}&amount=${amount}`;
+            }
+        }
+        
+        // ==========================================================
+        // EXPORT DATA
+        // ==========================================================
+        
+        function exportData() {
+            if (customers.length === 0) {
+                showToast('No data to export', 'warning');
+                return;
+            }
+            
+            // Create CSV
+            const headers = ['Name', 'Code', 'STB ID', 'Phone', 'Monthly Amount', 'Paid', 'Pending', 'Status', 'Paid Months'];
+            const rows = customers.map(c => [
+                c.name || '',
+                c.code || '',
+                c.stbId || '',
+                c.phone || '',
+                c.monthlyAmount || 0,
+                c.paidAmount || 0,
+                c.pendingAmount || 0,
+                c.status || 'PENDING',
+                c.paidMonths || 0
+            ]);
+            
+            const csv = [headers.join(','), ...rows.map(row => row.join(','))].join('\n');
+            
+            // Download
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `vscn_customers_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+            
+            showToast('Data exported successfully', 'success');
+        }
+        
+        // ==========================================================
+        // SHOW PAYMENT MODAL
+        // ==========================================================
+        
+        function showPaymentModal() {
+            // Simple prompt for now
+            const code = prompt('Enter customer code:');
+            if (code && code.trim()) {
+                quickPayment(code.trim().toUpperCase());
+            }
+        }
+        
+        // ==========================================================
+        // LOGOUT
+        // ==========================================================
         
         function logout() {
-            localStorage.removeItem('vscn_user');
-            window.location.href = 'index.html';
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('vscn_user');
+                localStorage.removeItem('vscn_token');
+                window.location.href = 'index.html';
+            }
         }
         
-        // Load dashboard on page load
-        loadDashboard();
-        <!-- Add sync status and button -->
-<div class="sync-bar" style="display:flex;align-items:center;gap:12px;padding:8px 16px;background:#f8f9fa;border-bottom:1px solid #eee;">
-    <i class="fas fa-sync-alt"></i>
-    <span id="syncStatus">Ready</span>
-    <span style="font-size:12px;color:#666;" id="lastSyncTime">
-        Last sync: ${lastSyncTime || 'Never'}
-    </span>
-    <button onclick="manualSync()" class="btn-sm btn-primary" style="margin-left:auto;">
-        <i class="fas fa-sync-alt"></i> Sync Now
-    </button>
-</div>
-
-<!-- Scripts -->
-<script src="js/sync.js">
+        // ==========================================================
+        // TOAST NOTIFICATION
+        // ==========================================================
+        
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type}`;
+            toast.classList.add('show');
+            
+            clearTimeout(toast._timeout);
+            toast._timeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 4000);
+        }
+        
+        // ==========================================================
+        // KEYBOARD SHORTCUTS
+        // ==========================================================
+        
+        document.addEventListener('keydown', function(e) {
+            // Ctrl+Shift+S = Sync
+            if (e.ctrlKey && e.shiftKey && e.key === 'S') {
+                e.preventDefault();
+                syncData();
+            }
+            
+            // Ctrl+Shift+F = Focus search
+            if (e.ctrlKey && e.shiftKey && e.key === 'F') {
+                e.preventDefault();
+                document.getElementById('searchInput').focus();
+            }
+            
+            // Escape = Clear search
+            if (e.key === 'Escape') {
+                document.getElementById('searchInput').value = '';
+                searchCustomers('');
+                document.getElementById('searchInput').blur();
+            }
+        });
     </script>
 </body>
 </html>
