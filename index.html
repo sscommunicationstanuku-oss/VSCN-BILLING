@@ -3,89 +3,197 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VSCN Billing System</title>
+    <title>VSCN Billing Login</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* Minimal working styles */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Poppins', sans-serif; background: #f0f2f5; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1a3c6e 0%, #2a5c8e 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
         
         .login-container {
-            max-width: 400px;
-            margin: 100px auto;
             background: white;
+            border-radius: 20px;
             padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            max-width: 420px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideUp 0.5s ease;
         }
         
-        .login-container h1 {
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo i {
+            font-size: 56px;
             color: #1a3c6e;
-            text-align: center;
-            margin-bottom: 8px;
+            background: #e8edf5;
+            padding: 20px;
+            border-radius: 16px;
         }
         
-        .login-container p {
-            text-align: center;
+        .logo h1 {
+            font-size: 28px;
+            color: #1a3c6e;
+            margin-top: 12px;
+            font-weight: 700;
+        }
+        
+        .logo p {
             color: #666;
-            margin-bottom: 24px;
+            font-size: 14px;
         }
         
         .form-group {
-            margin-bottom: 16px;
+            margin-bottom: 20px;
         }
         
         .form-group label {
             display: block;
             font-weight: 500;
-            margin-bottom: 6px;
             color: #333;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+        
+        .form-group .input-group {
+            position: relative;
+        }
+        
+        .form-group .input-group i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
         }
         
         .form-group input {
             width: 100%;
-            padding: 10px 14px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
+            padding: 12px 14px 12px 44px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
             font-size: 14px;
             font-family: inherit;
+            transition: all 0.3s;
         }
         
         .form-group input:focus {
             outline: none;
             border-color: #1a3c6e;
+            box-shadow: 0 0 0 4px rgba(26, 60, 110, 0.1);
         }
         
-        .btn {
+        .form-group input.error {
+            border-color: #dc3545;
+        }
+        
+        .btn-login {
             width: 100%;
-            padding: 12px;
+            padding: 14px;
             background: #1a3c6e;
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
+            transition: all 0.3s;
             font-family: inherit;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
         
-        .btn:hover {
+        .btn-login:hover:not(:disabled) {
             background: #0f284a;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(26, 60, 110, 0.3);
         }
         
-        .error {
-            color: #dc3545;
-            font-size: 14px;
-            margin-top: 8px;
-            text-align: center;
+        .btn-login:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
         }
         
-        .logo {
-            text-align: center;
-            font-size: 48px;
-            color: #1a3c6e;
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            display: none;
             margin-bottom: 16px;
+        }
+        
+        .error-message.show {
+            display: block;
+        }
+        
+        .footer-links {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 13px;
+            color: #666;
+        }
+        
+        .footer-links a {
+            color: #1a3c6e;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .demo-credentials {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            color: #666;
+            margin-top: 16px;
+            text-align: center;
+            border: 1px dashed #dee2e6;
+        }
+        
+        .demo-credentials strong {
+            color: #1a3c6e;
         }
     </style>
 </head>
@@ -93,60 +201,190 @@
     <div class="login-container">
         <div class="logo">
             <i class="fas fa-receipt"></i>
+            <h1>VSCN Billing</h1>
+            <p>Sign in to manage your billing</p>
         </div>
-        <h1>VSCN Billing</h1>
-        <p>Sign in to access your dashboard</p>
+        
+        <div id="errorMessage" class="error-message">
+            <i class="fas fa-exclamation-circle"></i>
+            <span id="errorText">Invalid credentials</span>
+        </div>
         
         <form id="loginForm" onsubmit="handleLogin(event)">
             <div class="form-group">
                 <label>Username</label>
-                <input type="text" id="username" placeholder="Enter username" required value="admin">
+                <div class="input-group">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="username" placeholder="Enter username" required>
+                </div>
             </div>
             
             <div class="form-group">
                 <label>Password</label>
-                <input type="password" id="password" placeholder="Enter password" required value="sai@7890">
+                <div class="input-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="password" placeholder="Enter password" required>
+                </div>
             </div>
             
-            <button type="submit" class="btn">Sign In</button>
-            <div id="errorMessage" class="error"></div>
+            <button type="submit" class="btn-login" id="loginBtn">
+                <i class="fas fa-sign-in-alt"></i>
+                Sign In
+            </button>
         </form>
         
-        <div style="margin-top: 16px; text-align: center; font-size: 12px; color: #999;">
-            <p>Demo Credentials: admin / admin123</p>
+        <div class="demo-credentials">
+            <strong>Demo Credentials:</strong><br>
+            Username: <strong>admin</strong> | Password: <strong>admin123</strong>
+        </div>
+        
+        <div class="footer-links">
+            <a href="#" onclick="showForgotPassword()">Forgot Password?</a>
         </div>
     </div>
 
     <script>
-        // Simple login handler
-        function handleLogin(event) {
+        // ==========================================================
+        // API CONFIGURATION
+        // ==========================================================
+        
+        // IMPORTANT: Update this URL with your Google Apps Script deployment URL
+        const API_URL = 'https://script.google.com/macros/library/d/1CI8XTx0_zmVMAmU2D5AFumXBQsdVuYJiexjzBKSzk4ZNNm_Wv-tSwNs9/195';
+        
+        // ==========================================================
+        // LOGIN HANDLER
+        // ==========================================================
+        
+        async function handleLogin(event) {
             event.preventDefault();
             
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
             const errorDiv = document.getElementById('errorMessage');
+            const errorText = document.getElementById('errorText');
+            const loginBtn = document.getElementById('loginBtn');
             
-            // Demo users
-            const users = {
-                'admin': 'admin123',
-                'collector': 'collector123'
-            };
+            // Clear previous error
+            errorDiv.classList.remove('show');
             
-            if (users[username] && users[username] === password) {
-                // Store login state
-                localStorage.setItem('vscn_user', JSON.stringify({
-                    username: username,
-                    name: username === 'admin' ? 'Administrator' : 'Collector',
-                    role: username === 'admin' ? 'ADMIN' : 'COLLECTOR'
-                }));
+            // Validate inputs
+            if (!username || !password) {
+                showError('Please enter both username and password');
+                return;
+            }
+            
+            // Show loading state
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = '<span class="spinner"></span> Signing in...';
+            
+            try {
+                // Call login API
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    mode: 'cors',
+                    body: JSON.stringify({
+                        action: 'login',
+                        username: username,
+                        password: password
+                    })
+                });
                 
-                // Redirect to dashboard
-                window.location.href = 'dashboard.html';
-                errorDiv.textContent = '';
-            } else {
-                errorDiv.textContent = 'Invalid username or password';
+                if (!response.ok) {
+                    throw new Error('Network error: ' + response.status);
+                }
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Save user data
+                    const userData = {
+                        username: data.data.username,
+                        name: data.data.name,
+                        role: data.data.role,
+                        token: data.data.token,
+                        loginTime: new Date().toISOString()
+                    };
+                    
+                    localStorage.setItem('vscn_user', JSON.stringify(userData));
+                    localStorage.setItem('vscn_token', data.data.token);
+                    
+                    // Redirect to dashboard
+                    window.location.href = 'dashboard.html';
+                    
+                } else {
+                    showError(data.message || 'Invalid credentials');
+                }
+                
+            } catch (error) {
+                console.error('Login error:', error);
+                showError('Connection error. Please check your network and try again.');
+            } finally {
+                // Reset button
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In';
             }
         }
+        
+        // ==========================================================
+        // ERROR DISPLAY
+        // ==========================================================
+        
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            const errorText = document.getElementById('errorText');
+            
+            errorText.textContent = message;
+            errorDiv.classList.add('show');
+            
+            // Highlight input fields
+            document.getElementById('username').classList.add('error');
+            document.getElementById('password').classList.add('error');
+            
+            // Remove error highlight on focus
+            document.getElementById('username').addEventListener('focus', function() {
+                this.classList.remove('error');
+            });
+            document.getElementById('password').addEventListener('focus', function() {
+                this.classList.remove('error');
+            });
+        }
+        
+        // ==========================================================
+        // FORGOT PASSWORD
+        // ==========================================================
+        
+        function showForgotPassword() {
+            alert('Please contact your administrator to reset your password.');
+        }
+        
+        // ==========================================================
+        // CHECK IF ALREADY LOGGED IN
+        // ==========================================================
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const userData = localStorage.getItem('vscn_user');
+            if (userData) {
+                try {
+                    const user = JSON.parse(userData);
+                    // Validate token (optional - can check with API)
+                    if (user.token) {
+                        // Redirect to dashboard
+                        window.location.href = 'dashboard.html';
+                    }
+                } catch (e) {
+                    // Invalid data, clear storage
+                    localStorage.removeItem('vscn_user');
+                    localStorage.removeItem('vscn_token');
+                }
+            }
+            
+            // Auto-fill demo credentials
+            document.getElementById('username').value = 'admin';
+            document.getElementById('password').value = 'admin123';
+        });
     </script>
 </body>
 </html>
